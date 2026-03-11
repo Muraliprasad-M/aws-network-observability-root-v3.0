@@ -1,0 +1,15 @@
+region = "eu-west-2"
+
+st_vpc_id = "vpc-st123"
+ot_vpc_id = "vpc-ot123"
+
+st_tgw_id = "tgw-st123"
+ot_tgw_id = "tgw-ot123"
+
+st_firewall_name = "st-firewall"
+ot_firewall_name = "ot-firewall"
+
+alarm_email = "network-alerts@example.com"
+
+zscaler_st_instances = ["i-st123"]
+zscaler_ot_instances = ["i-ot123"]
