@@ -1,74 +1,18 @@
-trigger:
-  branches:
-    include:
-      - '*'
+aws_region = "eu-west-2"
 
-resources:
-  repositories:
-    - repository: templates
-      type: git
-      name: pipeline-templates
-      ref: refs/tags/v1.1.1
+st_vpc_id = "vpc-0f88c9baaa557c312"
+ot_vpc_id = "vpc-08d937b89707ea8ac"
 
-pool:
-    vmImage: ubuntu-latest
+st_tgw_id = "tgw-0197ed40c5a15e3dd"
+ot_tgw_id = "tgw-046432679404c0c8e"
 
-stages:
-# ==========================================
-# VALIDATION STAGE
-# ==========================================
+st_firewall_name = "st-network-prod-euw2-firewall "
+ot_firewall_name = "ot-network-prod-euw2-firewall"
 
-- stage: Validate
-  displayName: 'Code Validation'
-  jobs:
-    - job: CodeValidation
-      steps:
-        - template: stages/code-validation-stage.yml@templates
+st_flow_log_group_name = "/aws/vpc-flow-logs/st-network-prod-hub-vpc"
+#ot_flow_log_group_name = "/aws/vpc/ot/flowlogs"
 
-# ==========================================
-# TERRAFORM PLAN STAGE
-# ==========================================
+#zscaler_st_instances = ["i-0stzscaler1"]
+#zscaler_ot_instances = ["i-0otzscaler1"]
 
-- stage: Plan
-  displayName: 'Terraform Plan'
-  dependsOn: Validate
-  condition: succeeded()
-  jobs:
-    - job: TerraformPlan
-      steps:
-        - template: stages/terraform-plan-stage.yml@templates
-          parameters:
-            tfStateBucket: 'st-network-prod-euw2-tfstate-eyqwgt'
-            tfStateKey: 'core-network-cw-dashboard-st-and-ot/terraform.tfstate'
-            tfStateLock: 'st-network-prod-euw2-tfstate-lock'
-            awsServiceConnection: 'aws-core-network'
-            roleArn: 'arn:aws:iam::732822664028:role/TerraformExecutionRole'
-
-# ==========================================
-# TERRAFORM APPLY STAGE
-# ==========================================
-
-- stage: Apply
-  displayName: 'Terraform Apply'
-  dependsOn: Plan
-  jobs:
-    - deployment: ApplyDeployment
-      displayName: "Run terraform apply"
-      environment: 'ManualApply'
-      condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - checkout: self
-              - template: stages/terraform-apply-stage.yml@templates
-                parameters:
-                  tfStateBucket: 'st-network-prod-euw2-tfstate-eyqwgt'
-                  tfStateKey: 'core-network-cw-dashboard-st-and-ot/terraform.tfstate'
-                  tfStateLock: 'st-network-prod-euw2-tfstate-lock'
-                  awsServiceConnection: 'aws-core-network'
-                  roleArn: 'arn:aws:iam::732822664028:role/TerraformExecutionRole'
-
-
-
-
+alarm_email = "murali.prasad@severntrent.co.uk"
